@@ -1,4 +1,4 @@
-import ConfigParser
+import configparser
 import io
 import sys
 
@@ -57,7 +57,7 @@ loadRXDStateOnly = 1
 # specified in section (sec) , option (opt), and value (val)
 # saves to output filepath fn
 def writeconf (fn,sec,opt,val):
-  conf = ConfigParser.ConfigParser()
+  conf = configparser.configparser()
   conf.readfp(io.BytesIO(def_config)) # start with defaults
   # then change entries by user-specs
   for i in xrange(len(sec)): conf.set(sec[i],opt[i],val[i])
@@ -67,7 +67,7 @@ def writeconf (fn,sec,opt,val):
 # read config file
 def readconf (fn="cawave.cfg"):
 
-  config = ConfigParser.ConfigParser()
+  config = configparser.configparser()
   config.read(fn)
 
   def conffloat (base,var,defa): # defa is default value
