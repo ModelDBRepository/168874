@@ -67,7 +67,7 @@ def writeconf (fn,sec,opt,val):
 # read config file
 def readconf (fn="cawave.cfg"):
 
-  config = configparser.configparser()
+  config = configparser.ConfigParser()
   config.read(fn)
 
   def conffloat (base,var,defa): # defa is default value
