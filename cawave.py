@@ -25,7 +25,7 @@ def setfcfg ():
   for i in xrange(len(sys.argv)):
     if sys.argv[i].endswith(".cfg") and os.path.exists(sys.argv[i]):
       fcfg = sys.argv[i]
-  print "config file is " , fcfg
+  #print "config file is " , fcfg
   return fcfg
 
 fcfg=setfcfg() # config file name
@@ -44,10 +44,10 @@ simdur = tstop # duration of simulation
 tstart = 0
 h.tstop = tstop
 
-if electrical: print 'running with electricity elements and a single AMPA synapse'
-else: print 'running without electricity'
+if electrical: print('running with electricity elements and a single AMPA synapse')
+else: print('running without electricity')
 
-def pnone (): print ''
+def pnone (): print( '')
 debug_here = pnone
 
 if ipydebug:
