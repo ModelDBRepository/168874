@@ -448,7 +448,7 @@ def recordVolt_vec():
   for node in ca[cyt].nodes(dend):
     myvec = h.Vector()
     myvec.record(dend(node.x)._ref_v, recdt)
-    #voltlist.append(myvec)
+    voltlist.append(myvec.to_python())
   return voltlist
 
 voltlist = recordVolt_vec()
