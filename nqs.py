@@ -10,7 +10,7 @@ nqsdel = h.nqsdel
 def np2nqs (npa,names=[]):
   nrow,ncol = numpy.shape(npa)
   if ncol < 2:
-    print "np2nqs ERRA: must have at least 2 columns!"
+    #print "np2nqs ERRA: must have at least 2 columns!"
     return None
   nqo = NQS(ncol)
   for i in xrange(ncol):
