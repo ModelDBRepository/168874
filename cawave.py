@@ -351,12 +351,10 @@ if ca_stimT==0:  place_ca_stim(minx=stim_minx,maxx=stim_maxx,CAStim=ca_stim)#cal
 h.dt = dt # only used when variable time-step integration is off (cvode.active()==0)
 
 data = {} # data structure for concentrations - voltArray is for voltage
-print(dend.nseg)
-print(ceil(simdur/recdt))
-data["cytca"] = numpy.zeros( (dend.nseg,int( ceil(simdur/recdt) ) ))
-data["erca"] = numpy.zeros( (dend.nseg, int(ceil(simdur/recdt) ) ))
-data["hgate"] = numpy.zeros( (dend.nseg, int(ceil(simdur/recdt) ) ))
-data["ip3"] =  numpy.zeros( (dend.nseg, int(ceil(simdur/recdt) ) ))
+data["cytca"] = numpy.zeros( (dend.nseg, ceil(simdur/recdt) ) )
+data["erca"] = numpy.zeros( (dend.nseg, ceil(simdur/recdt) ) )
+data["hgate"] = numpy.zeros( (dend.nseg, ceil(simdur/recdt) ) )
+data["ip3"] =  numpy.zeros( (dend.nseg, ceil(simdur/recdt) ) )
 datacol = 0
 
 # code for an alternative recording dictionary, using vec.record to reconrd concentrations
@@ -475,7 +473,7 @@ def myloaddata (simstr):
 def initrec ():
   global datacol
   datacol = 0
-  for k in data.keys(): data[k] = numpy.zeros( (dend.nseg, int(ceil(simdur/recdt))  ))
+  for k in data.keys(): data[k] = numpy.zeros( (dend.nseg, ceil(simdur/recdt))  )
 
 # record Nodelist nl's concentrations into dat (2D numpy array) 
 def dorec (dat, nl):
