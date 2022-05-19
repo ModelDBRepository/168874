@@ -2915,7 +2915,7 @@ FUNCTION isojt () {
   Object *ob1, *ob2;
   ob1 = *hoc_objgetarg(1); ob2 = *hoc_objgetarg(2);
   if (!ob1) if (!ob2) return 1; else return 0;
-#ifdef __cplusplus
+#ifdef NRN_VERSION_GTEQ_8_2_0
   if (!ob2 || ob1->ctemplate != ob2->ctemplate) {
 #else
   if (!ob2 || ob1->template != ob2->template) {
