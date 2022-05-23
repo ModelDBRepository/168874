@@ -1295,7 +1295,7 @@ static double keyind (void* vv) {
   int i, j, k, ni, nk, nv[VRRY], num;
   double *ind, *key, *vvo[VRRY];
   ni = vector_instance_px(vv, &ind); // vv is ind
-  for (i=0;ifarg(i);i++); i--; // drop back by one to get numarg()
+  for (i=0;ifarg(i);i++) {} i--; // drop back by one to get numarg()
   if (i>VRRY) hoc_execerror("ERR: keyind can only handle VRRY vectors", 0);
   num = i-1; // number of vectors to be picked apart 
   for (i=0;i<num;i++) { 
