@@ -16,7 +16,7 @@ http://www.neuron.yale.edu) compiled with python enabled. To draw the
 output you will need to have Matplotlib installed (
 http://matplotlib.org/ ).
 
-Instructions to run the model 
+Instructions to run the model
 - unzip the file
 - cd ca1dDemo
 - nrnivmodl (compiles the NMODL files)
@@ -88,12 +88,18 @@ interested in (in milliseconds). However, the resulting figure will
 not be identical to Fig. 11 in the publication.
 ----------------------------------------------------------------------
 
-For questions/comments email: 
+For questions/comments email:
  mohamed dot sherif dot md at gmail dot com
  or
  samn at neurosim dot downstate dot edu
  or
  robert dot mcdougal at yale dot edu
 
+Changelog
+---------
+
 20160915 This updated version from the Lytton lab allows their models
 which contain misc.mod and misc.h to compile on the mac.
+
+20220523 Updated MOD files to contain valid C++ and be compatible with
+the upcoming versions 8.2 and 9.0 of NEURON.
