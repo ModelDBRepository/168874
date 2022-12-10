@@ -1,4 +1,4 @@
-import ConfigParser
+import configparser
 import io
 import sys
 
@@ -57,7 +57,7 @@ loadRXDStateOnly = 1
 # specified in section (sec) , option (opt), and value (val)
 # saves to output filepath fn
 def writeconf (fn,sec,opt,val):
-  conf = ConfigParser.ConfigParser()
+  conf = configparser.configparser()
   conf.readfp(io.BytesIO(def_config)) # start with defaults
   # then change entries by user-specs
   for i in xrange(len(sec)): conf.set(sec[i],opt[i],val[i])
@@ -67,7 +67,7 @@ def writeconf (fn,sec,opt,val):
 # read config file
 def readconf (fn="cawave.cfg"):
 
-  config = ConfigParser.ConfigParser()
+  config = configparser.ConfigParser()
   config.read(fn)
 
   def conffloat (base,var,defa): # defa is default value
@@ -141,7 +141,7 @@ def readconf (fn="cawave.cfg"):
   electrical = confint('set', 'electrical', 0) # whether to include ion channels and synapses
   
   sys.stdout = open("./simconfloaded.log", "w") # will direct the print output to simconfloaded.log file
-  print "er_scale:",er_scale,",ip3_notorigin:",ip3_notorigin,",ip3_origin:",ip3_origin,\
+  print( "er_scale:",er_scale,",ip3_notorigin:",ip3_notorigin,",ip3_origin:",ip3_origin,\
       ",gserca:",gserca0,",boost_every:",boost_every,",ip3_stim:",ip3_stim, ",ip3rtau:",ip3rtau,\
       "cvodeactive:",cvodeactive," ,dt:",dt," ,runit:",runit," ,simstr:",simstr," ,saveout:",saveout,\
       "stim_minx:",stim_minx," ,stim_maxx:",stim_maxx," ,dodraw:",dodraw, ', loadState:',loadState, ", ip3_stimT:",ip3_stimT,\
@@ -152,7 +152,7 @@ def readconf (fn="cawave.cfg"):
       ' ,nstimInterval:', nstimInterval, ' ,nstimNumber:', nstimNumber, ' ,nconnThreshold:', nconnThreshold,\
       ' ,nconnDelay:', nconnDelay, ' ,nconnWeight:', nconnWeight, ' ,nconnActive:', nconnActive, \
       ' ,ipydebug:', ipydebug,  ' ,statestr:', statestr, ' ,savestate:', savestate, ' ,useInitDict:', useInitDict, \
-      ' ,IP3ForceInit:', IP3ForceInit, ' ,loadRXDStateOnly:', loadRXDStateOnly, ' ,electrical:', electrical
+      ' ,IP3ForceInit:', IP3ForceInit, ' ,loadRXDStateOnly:', loadRXDStateOnly, ' ,electrical:', electrical)
   sys.stdout = sys.__stdout__
   return er_scale,ip3_notorigin,ip3_origin,gserca0,boost_every,ip3_stim,\
       gleak0,ip3rtau,recdt,tstop,cvodeactive,dt,runit,simstr,saveout,\

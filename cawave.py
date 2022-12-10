@@ -9,12 +9,13 @@ from math import ceil
 h.load_file("stdrun.hoc") # creates cvode object
 from nqs import *
 from conf import *
-from time import time, clock
+#from time import time
+import time
 
-from time import clock # to time simulation
+#from time import clock # to time simulation
 import datetime # to format time of run
 import pickle
-import ConfigParser
+import configparser
 dataDir = './data/'
 
 
@@ -22,10 +23,10 @@ dataDir = './data/'
 def setfcfg ():
   '''determine config file name'''
   fcfg = "cawave.cfg" # default config file name
-  for i in xrange(len(sys.argv)):
+  for i in range(len(sys.argv)):
     if sys.argv[i].endswith(".cfg") and os.path.exists(sys.argv[i]):
       fcfg = sys.argv[i]
-  print "config file is " , fcfg
+  #print "config file is " , fcfg
   return fcfg
 
 fcfg=setfcfg() # config file name
@@ -44,24 +45,24 @@ simdur = tstop # duration of simulation
 tstart = 0
 h.tstop = tstop
 
-if electrical: print 'running with electricity elements and a single AMPA synapse'
-else: print 'running without electricity'
+if electrical: print('running with electricity elements and a single AMPA synapse')
+else: print('running without electricity')
 
-def pnone (): print ''
+def pnone (): print( '')
 debug_here = pnone
 
 if ipydebug:
   from IPython.core.debugger import Tracer;
   debug_here = Tracer() #debugging using ipdb
 
-def printt (s=''): print s, ': t = ',h.t
+def printt (s=''): print( s, ': t = ',h.t)
 
 # backup the config file
 def backupcfg (simstr):
   if not os.path.exists('backupcfg'): os.mkdir('backupcfg')
   fout = 'backupcfg/' + simstr + '.cfg'
   if os.path.exists(fout):
-    print 'removing prior cfg file' , fout
+    print( 'removing prior cfg file' , fout)
     os.system('rm ' + fout)  
   os.system('cp ' + fcfg + ' ' + fout) # fcfg created in geom.py via conf.py
 
@@ -130,7 +131,8 @@ def insertSyn(synLocl, nstimStart, nstimInterval, nstimNumber, nconnThreshold, n
   lrandomSeed = [1234, 2345, 3456, 4567, 5678, 6789, 7890, 8901, 9012, 9876]  
   # add list of netstim
   netStimlist = []
-  for i in xrange(len(synlist)):
+  #for i in xrange(len(synlist)):
+  for i in range(len(synlist)):
     myns = h.NetStim()
     myns.seed(1234)
     myns.start = nstimStart # to coincide with the IP3 stimulus
@@ -140,7 +142,7 @@ def insertSyn(synLocl, nstimStart, nstimInterval, nstimNumber, nconnThreshold, n
   # add list of netcon
   netConlist = []
   netConRecveclist = [] # list of vectors which record netCon event times
-  for i in xrange(len(synlist)):
+  for i in range(len(synlist)):
     mync = h.NetCon(netStimlist[0], synlist[i], nconnThreshold, nconnDelay, nconnWeight) # one netstim conneted to all synapses 
     # zero delay (to make it instantaneous)
     mync.active(nconnActive)
@@ -148,8 +150,8 @@ def insertSyn(synLocl, nstimStart, nstimInterval, nstimNumber, nconnThreshold, n
     myncvec = h.Vector()
     mync.record(myncvec)# record time events from netCon
     netConRecveclist.append(myncvec)
-  if len(synlist) ==0: print 'no synapses inserted'
-  else: print 'inserted synapse(s) at dend location(s):', synLocl
+  if len(synlist) ==0: print( 'no synapses inserted')
+  else: print ('inserted synapse(s) at dend location(s):', synLocl)
   return synlist, netStimlist, netConlist, netConRecveclist
 
 synlist, netStimlist, netConlist, netConRecveclist = None,None,None,None
@@ -199,8 +201,7 @@ minf = ip3[cyt] * 1000. * ca[cyt] / (ip3[cyt] + Kip3) / (1000. * ca[cyt] + Kact)
 ip3r_gate_state = rxd.State(cyt_er_membrane, initial=0.8)
 h_gate = ip3r_gate_state[cyt_er_membrane]
 k = gip3r[cyt] * (minf * h_gate) ** 3 
-ip3r = rxd.MultiCompartmentReaction(ca[er]<>ca[cyt], k, k, membrane=cyt_er_membrane)
-
+ip3r = rxd.MultiCompartmentReaction(ca[er], ca[cyt], k, k, membrane=cyt_er_membrane)
 # IP3 receptor gating
 ip3rg = rxd.Rate(h_gate, (1. / (1 + 1000. * ca[cyt] / (0.4)) - h_gate) / ip3rtau)
 
@@ -209,12 +210,12 @@ Kserca = 0.1 # Michaelis constant for SERCA pump
 serca = rxd.MultiCompartmentReaction(ca[cyt]>ca[er],gserca[cyt]*(1e3*ca[cyt])**2/(Kserca**2+(1e3*ca[cyt])**2),membrane=cyt_er_membrane,custom_dynamics=True)
 
 # leak channel: bidirectional ca flow btwn cyt <> ER
-leak = rxd.MultiCompartmentReaction(ca[er]<>ca[cyt], gleak[cyt], gleak[cyt], membrane=cyt_er_membrane)
+leak = rxd.MultiCompartmentReaction(ca[er],ca[cyt], gleak[cyt], gleak[cyt], membrane=cyt_er_membrane)
 
 
 def getInitDict(fname=fcfg):
   '''return a dictioinary containing the state variables and their values, obtained from initation file fname'''
-  config = ConfigParser.ConfigParser()
+  config = configparser.configparser()
   config.read(fname)
   varnameList = ['o_cagk', 'm_cal', 'h_can', 'm_can', 'h_cat', 'm_cat', 'l_kap', 'n_kap', 'n_kdr', 'h_na3', 'm_na3', 's_na3', 'ip3', 'ip3r_gate_state', 'v', 'ca_cyt']#, 'ca_er']
   initDict = {}
@@ -230,9 +231,9 @@ def printGetEventQueueinfo():
   flagvec = h.Vector()
   targetlist = h.List()
   h.cvode.event_queue_info(3, tvec, flagvec, targetlist)
-  print 'tvec:', tvec.printf()
-  print 'flagvec:', flagvec.printf()
-  print 'targetlist count:', targetlist.count()
+  print( 'tvec:', tvec.printf())
+  print( 'flagvec:', flagvec.printf())
+  print( 'targetlist count:', targetlist.count())
   return tvec, flagvec, targetlist
 
 def setHocStateVars(fname=fcfg):
@@ -251,7 +252,7 @@ def setHocStateVars(fname=fcfg):
   dend.h_na3 = initDict['h_na3']
   dend.m_na3 = initDict['m_na3']
   dend.s_na3 = initDict['s_na3']
-  print 'from setHocStateVars:\n', printGetEventQueueinfo()
+  #print 'from setHocStateVars:\n', printGetEventQueueinfo()
 
 def setRxDStateVars(fname=fcfg):
   '''will initilize rxd state variables using values from dictionary initDict'''
@@ -261,7 +262,7 @@ def setRxDStateVars(fname=fcfg):
   ca[cyt].concentration = initDict['ca_cyt']
   ip3[cyt].concentration = initDict['ip3']
   ip3r_gate_state[cyt_er_membrane].concentration = initDict['ip3r_gate_state']
-  print 'from setRxDStateVars:\n', printGetEventQueueinfo()
+  #print 'from setRxDStateVars:\n', printGetEventQueueinfo()
   
 def getStateVarsDict():
     '''will return a dictionary with hoc state variables and their values at dendloc.'''
@@ -289,7 +290,7 @@ def getStateVarsDict():
 # place the ip3 to stimulate ca wave
 def place_ip3_stim (minx=stim_minx,maxx=stim_maxx,IP3Stim=ip3_stim):
   if IP3Stim <= 0.0: return # no null stim - use baseline for empty stim
-  print "\ntime : " , h.t, " , placing ip3 stim from : " , minx, " to " , maxx, " . val = " , IP3Stim
+  #print "\ntime : " , h.t, " , placing ip3 stim from : " , minx, " to " , maxx, " . val = " , IP3Stim
   # this gives us four nodes (498.5, 499.5, 500.5, 501.5)
   for node in ip3.nodes:
     if minx < node.x * dend.L < maxx:
@@ -300,12 +301,12 @@ def place_ip3_stim (minx=stim_minx,maxx=stim_maxx,IP3Stim=ip3_stim):
 
 # check the ip3 stim for ca wave
 def check_ip3_stim (minx=stim_minx,maxx=stim_maxx,IP3Stim=ip3_stim):
-  print "\ntime : " , h.t, " , checking ip3 stim from : " , minx, " to " , maxx, " . val = " , IP3Stim
+  #print "\ntime : " , h.t, " , checking ip3 stim from : " , minx, " to " , maxx, " . val = " , IP3Stim
   # this gives us four nodes (498.5, 499.5, 500.5, 501.5)
   stimxlist = []
   for node in ip3.nodes:
     if minx < node.x * dend.L < maxx:
-      print "node.x " , node.x, ", concentration is " , node.concentration
+      #print "node.x " , node.x, ", concentration is " , node.concentration
       stimxlist.append(node.x)
 
 def get_ip3stimLoc(minx=stim_minx, maxx=stim_maxx):
@@ -319,7 +320,7 @@ def get_ip3stimLoc(minx=stim_minx, maxx=stim_maxx):
 # place ca to stimulate ca wave
 def place_ca_stim (minx=stim_minx,maxx=stim_maxx,CAStim=ca_stim):
   if CAStim <= 0.0: return # no null stim - use baseline for empty stim
-  print "\ntime : " , h.t, " , placing ca stim from : " , minx, " to " , maxx, " . val = " , CAStim
+  #print "\ntime : " , h.t, " , placing ca stim from : " , minx, " to " , maxx, " . val = " , CAStim
   for node in ca.nodes:
     if minx < node.x * dend.L < maxx: node.concentration = CAStim
   if ca_stimT > 0: # only re_init if called from event queue
@@ -447,7 +448,7 @@ def recordVolt_vec():
   for node in ca[cyt].nodes(dend):
     myvec = h.Vector()
     myvec.record(dend(node.x)._ref_v, recdt)
-    voltlist.append(myvec)
+    voltlist.append(myvec.to_python())
   return voltlist
 
 voltlist = recordVolt_vec()
@@ -455,7 +456,7 @@ voltlist = recordVolt_vec()
 # save data dictionary as compressed numpy array (npz format)
 def mysavedata (simstr,ldata=data):
   fname = "./data/" + simstr + "_.npz"
-  print 'saving data...'
+  #print 'saving data...'
   if electrical:
     numpy.savez_compressed(fname,cytca=ldata["cytca"],erca=ldata["erca"],hgate=ldata["hgate"],ip3=ldata["ip3"], volt=np.array(voltlist))
   else:
@@ -524,11 +525,11 @@ def dorecord ():
 
 # run the sim and save calcium levels in data
 def myrun ():
-  clockStart = clock()
+  clockStart = time.process_time()
   if h.t > 0: # was this sim run already?
     if ip3_stimT==0: place_ip3_stim(minx=stim_minx,maxx=stim_maxx,IP3Stim=ip3_stim)
     if ca_stimT==0: place_ca_stim(minx=stim_minx,maxx=stim_maxx,CAStim=ca_stim)  
-  print "starting simulation..."
+  #print "starting simulation..."
   initrec() # initialize recording data structures - does not create any events or call Vector record
   h.init() # contains a call to h.finitialize
   # must setup hotspots after h.init/h.finitialize, otherwise the rxd.Parameter initial values are set/used
@@ -546,7 +547,7 @@ def myrun ():
   if IP3ForceInit:
     ip3[cyt].concentration = ip3_init
     h.cvode.re_init() 
-  print '\ntstart:',tstart,' tstop:', tstop, 'h.tstop:', h.tstop
+  #print '\ntstart:',tstart,' tstop:', tstop, 'h.tstop:', h.tstop
   # only set event if supposed to place stim(s) after t=0 (otherwise already set above)
   if ip3_stimT > 0: h.cvode.event(tstart+ip3_stimT,place_ip3_stim) # put an event on queue to set ip3 stim
   if ca_stimT > 0: h.cvode.event(tstart+ca_stimT,place_ca_stim) # put an event on queue to set ca stim
@@ -559,8 +560,8 @@ def myrun ():
   while h.t < tstop: h.advance() # make sure get to tstop
   #print 'ran from ' , timeVec[0], ' to ', timeVec[1], ' to ', timeVec[-1]  
   #printt('final time')  
-  clockEnd = clock()  
-  print '\nsim runtime:',str(datetime.timedelta(seconds=clockEnd - clockStart)),'secs'#format s as hh:mm:ss
+  clockEnd = time.process_time()  
+  #print( '\nsim runtime:',str(datetime.timedelta(seconds=clockEnd - clockStart)),'secs'#format s as hh:mm:ss
 
 # loop using fadvance and save the dts - only useful when have cvode.active(1)
 def checkdts (iters=1000):
@@ -586,7 +587,7 @@ def mydraw (data=data,vmin=[0,0,0],vmax=[0.002,0.2, 0.011],startt=tstart,endt=ts
     xlim( (startt/1e3, endt/1e3) ); ylim( (miny, maxy+1) );
     ylabel(r'Position ($\mu$m)');  title(titles[i]); colorbar();
     if i == len(keys)-1: xlabel('Time(s)');
-    print keys[i],":",mymin, mymax
+    #print keys[i],":",mymin, mymax
     splotlist.append(splot)
     gn += 1
     i += 1
@@ -603,16 +604,19 @@ def markStim(mysubplot):
     mysubplot.title.set_text(mysubplot.title.get_text()+' [cross: syn depol.]')
     for myvec in enumerate(netConRecveclist):
       #debug_here()
-      Lchan_stim_time = np.array(myvec[1])/1e3#; print Lchan_stim_time
+      Lchan_stim_time = np.array(myvec[1])/1e3#; print( Lchan_stim_time)
       Lchan_stim_x = np.repeat(synLocl[myvec[0]]*dend.L, Lchan_stim_time.size)#; print Lchan_stim_x
       mysubplot.plot(Lchan_stim_time, Lchan_stim_x, 'mx', markersize=12, markeredgewidth=2)
 
 
-def voltDraw(voltArr=np.array(voltlist), startt=tstart, endt=h.tstop, miny=0, maxy=int(dend.L), mycmap=cm.jet):
-  '''will plot voltage from voltArray (2D image)'''
+#def voltDraw(voltArr=np.array(voltlist), startt=tstart, endt=h.tstop, miny=0, maxy=int(dend.L), mycmap=cm.jet):
+def voltDraw(voltArr=np.array(voltlist), startt=tstart, endt=h.tstop, miny=0, maxy=101, mycmap=cm.jet):
+  #'''will plot voltage from voltArray (2D image)'''
+  #pass
   mp.gca()
-  debug_here()
-  mymin,mymax = amin(voltArr),amax(voltArr)
+  #debug_here()
+  #mymin,mymax = amin(voltArr),amax(voltArr)
+  mymin,mymax = 0,100
   mp.imshow(voltArr, aspect='auto', extent=(startt/1e3, endt/1e3, 0, int(dend.L)), cmap=mycmap)
   ylabel(r'Position ($\mu$m)');   xlabel('Time (s)'); title('Voltage (mV)')
   mp.colorbar()
@@ -661,9 +665,9 @@ def wavenq (dat,thresh=caCYT_init*2,verbose=False):
     midy = int(slicey.start + (slicey.stop - slicey.start) / 2.0)
     lastyup,lastydown,speed = midy,midy,0
     lastyuph,lastydownh = midy,midy
-    if verbose:
-      print "slicex:",slicex.start, slicex.stop
-      print "slicey:",slicey.start, slicey.stop   
+    #if verbose:
+      #print "slicex:",slicex.start, slicex.stop
+      #print "slicey:",slicey.start, slicey.stop   
     # y0 + (y1-y0) * (threshold-f(y0)) /  (f(y1)-f(y0))
     x,y = slicex.start, midy
     if lab[y][x] == widx:
@@ -673,7 +677,7 @@ def wavenq (dat,thresh=caCYT_init*2,verbose=False):
     while x < slicex.stop: # traverse through time      
       found = False 
       y = slicey.stop - 1 # look for highest point
-      if verbose: print "x:",x, "y:", y, " = ", lab[y][x]
+      #if verbose: print "x:",x, "y:", y, " = ", lab[y][x]
       while y >= slicey.start: # starting above and going down until hit it
         if lab[y][x] == widx:
           if x > 0:
@@ -689,7 +693,7 @@ def wavenq (dat,thresh=caCYT_init*2,verbose=False):
         if y + 1 < len(dat):
           y0,y1 = y, y + 1 # y0 is part of wave, y1 is above its top at t=x so dat[y1][x] <= thresh
           yh = y0 + (thresh-dat[y1][x]) / (dat[y0][x]-dat[y1][x])
-        if verbose: print "found u " , x , y, yh
+        #if verbose: print "found u " , x , y, yh
         endx,speed = scanx(lab,thresh,widx,x,y,slicex,yh,lastyuph)
         olap = 0
         if y == lastyup and x < lastendxup: olap = 1
@@ -712,7 +716,7 @@ def wavenq (dat,thresh=caCYT_init*2,verbose=False):
         if y - 1 >= 0: 
           y0,y1 = y, y - 1 # y0 is part of wave, y1 is below its bottom at t=x so dat[y1][x] <= thresh
           yh = y0 - (thresh-dat[y1][x]) / (dat[y0][x]-dat[y1][x])
-        if verbose: print "found d " , x , y, yh
+        #if verbose: print "found d " , x , y, yh
         endx,speed = scanx(lab,thresh,widx,x,y,slicex,yh,lastydownh)
         olap = 0
         if y == lastydown and x < lastendxdown: olap = 1
@@ -866,12 +870,12 @@ def loadhocstate (filestr):
     myss.fread(myfile)
     myfile.close()
     myss.restore(1)
-    print 'loaded hoc states from:', myfile.getname()
+    #print 'loaded hoc states from:', myfile.getname()
     tstart = h.t
     tstop = tstart + simdur # stopping time of simulation
     h.tstop = tstop
     #for ns in netStimlist: ns.start = nstimStart + tstart
-  else: print "file cannot be open to read"
+  else: pass#print "file cannot be open to read"
 
 # save rxd-related state variables
 def saverxdstate (filestr):
@@ -879,7 +883,7 @@ def saverxdstate (filestr):
   try:
     np.save('./data/'+filestr+'_rxd_.npy', rxd.node._states)
   except:
-    print 'no rxd'
+    print( 'no rxd')
 
 # load rxd-related state variables
 def loadrxdstate(filestr):
@@ -890,12 +894,14 @@ def loadrxdstate(filestr):
   try:
     xx = np.load(fname)
   except:
-    print 'loadrxdstate ERRA: could not load ', fname
+    pass
+    #print 'loadrxdstate ERRA: could not load ', fname
   try:
     rxd.node._states[:] = xx # this line has to be that way to avoid memory problems
-    print 'loaded rxd states from:', fname
+    #print 'loaded rxd states from:', fname
   except:
-    print 'loadrxdstate ERRB: could not set rxd.node._states from ', fname
+    pass
+    #print 'loadrxdstate ERRB: could not set rxd.node._states from ', fname
 
 # saves simulation state and time
 def savestate (filestr):
@@ -918,15 +924,15 @@ def displaySimTime():
 
 if __name__ == '__main__':     # if ran directly
   if runit: # run sim ?
-    print "running..."
+    #print "running..."
     myrun()
     if saveout: # save data ?
-      print "saving output..."
+      #print "saving output..."
       mysavedata(simstr,ldata=data)
     if saveState: # save state info
-      print 'saving state...'
+      #print 'saving state...'
       savestate(simstr) # save the state to simstr+.dat (for hoc) and simstr+.npy (for rxd)
     if dodraw:
-      print "drawing..."
+      #print "drawing..."
       mydraw()
       show()
